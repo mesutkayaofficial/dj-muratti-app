@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DJ MURATTI Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #04060f;
+    --surface: #0b0e1a;
+    --surface2: #111525;
+    --border: rgba(255,255,255,0.06);
+    --cyan: #00f5ff;
+    --green: #1ed760;
+    --purple: #a855f7;
+    --pink: #ff2d78;
+    --text: #e8eaf6;
+    --muted: #5a6180;
+    --tiktok: #ff2d55;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Syne', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  /* Phone Frame */
+  .phone {
+    width: 390px;
+    min-height: 844px;
+    background: var(--bg);
+    border-radius: 52px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #0a0c14,
+      0 0 0 10px rgba(255,255,255,0.06),
+      0 40px 120px rgba(0,0,0,0.8),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    animation: phoneIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes phoneIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 37px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .di-camera {
+    width: 12px; height: 12px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    border: 1px solid #222;
+    position: relative;
+  }
+
+  .di-camera::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 6px; height: 6px;
+    background: #0a1a2a;
+    border-radius: 50%;
+  }
+
+  .di-dot {
+    width: 8px; height: 8px;
+    background: #1ed760;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #1ed760;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* Status Bar */
+  .statusbar {
+    height: 59px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Scroll Container */
+  .scroll-content {
+    height: calc(844px - 59px - 84px);
+    overflow-y: auto;
+    padding: 0 20px 20px;
+    scrollbar-width: none;
+  }
+
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0 20px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .menu-btn {
+    width: 38px; height: 38px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    gap: 5px; cursor: pointer;
+  }
+
+  .menu-btn span {
+    display: block;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  .menu-btn span:nth-child(1) { width: 22px; }
+  .menu-btn span:nth-child(2) { width: 16px; }
+  .menu-btn span:nth-child(3) { width: 19px; }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #fff 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    color: #000;
+    box-shadow: 0 0 16px rgba(0, 245, 255, 0.4);
+  }
+
+  /* Page Title */
+  .page-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  /* Master Meter Card */
+  .master-meter {
+    background: linear-gradient(135deg, #0d1228 0%, #111830 100%);
+    border: 1px solid rgba(0, 245, 255, 0.15);
+    border-radius: 24px;
+    padding: 22px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    animation: cardIn 0.6s 0.1s both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .master-meter::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(0,245,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .card-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .card-arrow {
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  /* Gauge */
+  .gauge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .gauge {
+    width: 110px; height: 110px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .gauge svg {
+    width: 110px; height: 110px;
+    transform: rotate(-135deg);
+  }
+
+  .gauge-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+  }
+
+  .gauge-fill-cyan {
+    fill: none;
+    stroke: url(#cyanGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 40;
+    animation: gaugeAnim 1.5s 0.5s both;
+  }
+
+  @keyframes gaugeAnim {
+    from { stroke-dashoffset: 220; }
+    to { stroke-dashoffset: 40; }
+  }
+
+  .gauge-fill-purple {
+    fill: none;
+    stroke: url(#purpleGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 110;
+    animation: gaugeAnim2 1.5s 0.7s both;
+  }
+
+  @keyframes gaugeAnim2 {
+    from { stroke-dashoffset: 220; }
+    to { stroke-dashoffset: 110; }
+  }
+
+  .gauge-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .gauge-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 19px;
+    font-weight: 900;
+    color: var(--cyan);
+    line-height: 1;
+    text-shadow: 0 0 20px var(--cyan);
+  }
+
+  .gauge-sub {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    margin-top: 3px;
+  }
+
+  .gauge-stats {
+    flex: 1;
+  }
+
+  .gauge-stat {
+    margin-bottom: 12px;
+  }
+
+  .gauge-stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .gauge-stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .gauge-stat-value.cyan { color: var(--cyan); text-shadow: 0 0 10px rgba(0,245,255,0.4); }
+  .gauge-stat-value.green { color: var(--green); text-shadow: 0 0 10px rgba(30,215,96,0.4); }
+  .gauge-stat-value.purple { color: var(--purple); text-shadow: 0 0 10px rgba(168,85,247,0.4); }
+
+  /* Platform Chips */
+  .platform-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    animation: cardIn 0.6s 0.2s both;
+  }
+
+  .platform-chip {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  .platform-chip:active { transform: scale(0.97); }
+
+  .platform-chip.tiktok { border-color: rgba(255,45,85,0.3); }
+  .platform-chip.spotify { border-color: rgba(30,215,96,0.3); }
+  .platform-chip.youtube { border-color: rgba(255,87,34,0.3); }
+  .platform-chip.soundcloud { border-color: rgba(255,136,0,0.3); }
+
+  .chip-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .chip-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .chip-label {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 3px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Chart Card */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px;
+    margin-bottom: 14px;
+    animation: cardIn 0.6s 0.3s both;
+  }
+
+  .chart-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .chart-period {
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.05);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .chart-platform-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .platform-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .platform-name {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .platform-count {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* SVG Chart */
+  .chart-svg-wrap {
+    width: 100%;
+    height: 80px;
+    position: relative;
+  }
+
+  .chart-svg-wrap svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .day-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 4px 0;
+  }
+
+  .day-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* Bookings */
+  .bookings-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px;
+    margin-bottom: 14px;
+    animation: cardIn 0.6s 0.4s both;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .see-all {
+    font-size: 12px;
+    color: var(--cyan);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .bookings-table-head {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1fr;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+
+  .th {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .booking-row {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1fr;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 8px;
+  }
+
+  .booking-row:last-child { border-bottom: none; }
+
+  .booking-date {
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .booking-time {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .venue-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .venue-city {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .booking-fee {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    text-align: right;
+  }
+
+  /* Top Videos */
+  .videos-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px;
+    margin-bottom: 14px;
+    animation: cardIn 0.6s 0.5s both;
+  }
+
+  .video-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+  }
+
+  .video-item:last-child { border-bottom: none; }
+
+  .video-rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    width: 20px;
+    text-align: center;
+  }
+
+  .video-rank.top { color: var(--cyan); }
+
+  .video-thumb {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--surface2), #1a1f35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-thumb::after {
+    content: '▶';
+    position: absolute;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    right: 4px;
+    bottom: 4px;
+  }
+
+  .video-info { flex: 1; min-width: 0; }
+
+  .video-user {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .video-user span {
+    color: var(--cyan);
+  }
+
+  .video-views {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .video-bar-wrap {
+    width: 60px;
+  }
+
+  .video-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .video-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+
+  .video-views-big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 84px;
+    background: rgba(10,12,22,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding-top: 14px;
+    z-index: 50;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 14px;
+    transition: background 0.2s;
+  }
+
+  .nav-item.active {
+    background: rgba(0, 245, 255, 0.08);
+  }
+
+  .nav-icon {
+    font-size: 20px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+
+  .nav-item.active .nav-label {
+    color: var(--cyan);
+  }
+
+  .nav-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+
+  /* Glow bg effects */
+  .bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-glow-1 {
+    top: 80px; left: -80px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(0,245,255,0.05) 0%, transparent 70%);
+  }
+
+  .bg-glow-2 {
+    top: 400px; right: -60px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%);
+  }
+
+  /* Stat Row */
+  .stat-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    animation: cardIn 0.6s 0.25s both;
+  }
+
+  .stat-mini {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-mini::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+  }
+
+  .stat-mini.s1::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+  .stat-mini.s2::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-mini.s3::before { background: linear-gradient(90deg, var(--purple), transparent); }
+
+  .stat-mini-icon {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .stat-mini-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-mini-val.c { color: var(--cyan); }
+  .stat-mini-val.g { color: var(--green); }
+  .stat-mini-val.p { color: var(--purple); }
+
+  .stat-mini-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .stat-mini-change {
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .up { color: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Dynamic Island -->
+  <div class="dynamic-island">
+    <div class="di-camera"></div>
+    <div class="di-dot"></div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="3" width="3" height="9" rx="1" fill="rgba(255,255,255,0.5)"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="rgba(255,255,255,0.6)"/><rect x="9" y="0" width="3" height="12" rx="1" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="white"/></svg>
+      <svg width="16" height="12" viewBox="0 0 20 14"><path d="M10 2.5C12.8 2.5 15.3 3.6 17.1 5.4L18.9 3.6C16.6 1.4 13.5 0 10 0C6.5 0 3.4 1.4 1.1 3.6L2.9 5.4C4.7 3.6 7.2 2.5 10 2.5Z" fill="white"/><path d="M10 7.5C11.6 7.5 13.1 8.1 14.2 9.2L16 7.4C14.4 5.9 12.3 5 10 5C7.7 5 5.6 5.9 4 7.4L5.8 9.2C6.9 8.1 8.4 7.5 10 7.5Z" fill="white"/><circle cx="10" cy="12" r="2" fill="white"/></svg>
+      <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="1" width="22" height="10" rx="3" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/><rect x="1" y="2" width="17" height="8" rx="2" fill="white"/><rect x="23" y="4" width="3" height="4" rx="1.5" fill="rgba(255,255,255,0.4)"/></svg>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="scroll-content">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="menu-btn">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="header-title">DJ MURATTI</div>
+      </div>
+      <div class="avatar">M</div>
+    </div>
+
+    <div class="page-title">Analytics</div>
+
+    <!-- Master Meter -->
+    <div class="master-meter">
+      <div class="card-header">
+        <span class="card-label">Master Reach</span>
+        <span class="card-arrow">›</span>
+      </div>
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <svg viewBox="0 0 110 110">
+            <defs>
+              <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#00f5ff"/>
+                <stop offset="100%" style="stop-color:#a855f7"/>
+              </linearGradient>
+              <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#1ed760"/>
+                <stop offset="100%" style="stop-color:#00f5ff"/>
+              </linearGradient>
+            </defs>
+            <circle class="gauge-bg" cx="55" cy="55" r="40"/>
+            <circle class="gauge-fill-cyan" cx="55" cy="55" r="40"/>
+            <circle class="gauge-fill-purple" cx="55" cy="55" r="29"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-value">76.3K</div>
+            <div class="gauge-sub">OVERALL</div>
+          </div>
+        </div>
+        <div class="gauge-stats">
+          <div class="gauge-stat">
+            <div class="gauge-stat-label">TikTok Kullanım</div>
+            <div class="gauge-stat-value cyan">43.2K</div>
+          </div>
+          <div class="gauge-stat">
+            <div class="gauge-stat-label">Stream Views</div>
+            <div class="gauge-stat-value green">21.7K</div>
+          </div>
+          <div class="gauge-stat">
+            <div class="gauge-stat-label">YouTube Plays</div>
+            <div class="gauge-stat-value purple">11.4K</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Stats -->
+    <div class="platform-row">
+      <div class="platform-chip tiktok">
+        <div class="chip-icon">🎵</div>
+        <div class="chip-val">43.2K</div>
+        <div class="chip-label">TikTok</div>
+      </div>
+      <div class="platform-chip spotify">
+        <div class="chip-icon">🎧</div>
+        <div class="chip-val">13.4K</div>
+        <div class="chip-label">Spotify</div>
+      </div>
+      <div class="platform-chip youtube">
+        <div class="chip-icon">▶️</div>
+        <div class="chip-val">11.4K</div>
+        <div class="chip-label">YouTube</div>
+      </div>
+      <div class="platform-chip soundcloud">
+        <div class="chip-icon">☁️</div>
+        <div class="chip-val">8.3K</div>
+        <div class="chip-label">SoundCloud</div>
+      </div>
+    </div>
+
+    <!-- Mini Stats -->
+    <div class="stat-row">
+      <div class="stat-mini s1">
+        <div class="stat-mini-icon">🎬</div>
+        <div class="stat-mini-val c">150</div>
+        <div class="stat-mini-label">Video Kullanım</div>
+        <div class="stat-mini-change up">↑ +12 bu hafta</div>
+      </div>
+      <div class="stat-mini s2">
+        <div class="stat-mini-icon">👁</div>
+        <div class="stat-mini-val g">2.1M</div>
+        <div class="stat-mini-label">Top 150 View</div>
+        <div class="stat-mini-change up">↑ +8.4%</div>
+      </div>
+      <div class="stat-mini s3">
+        <div class="stat-mini-icon">🔥</div>
+        <div class="stat-mini-val p">4.8K</div>
+        <div class="stat-mini-label">Haftalık Peak</div>
+        <div class="stat-mini-change up">↑ trending</div>
+      </div>
+    </div>
+
+    <!-- Spotify Chart -->
+    <div class="chart-card">
+      <div class="chart-meta">
+        <div class="chart-title">Music Streaming</div>
+        <div class="chart-period">Past week</div>
+      </div>
+      <div class="chart-platform-row">
+        <div class="platform-dot" style="background:#1ed760; box-shadow:0 0 6px #1ed760;"></div>
+        <span class="platform-name">Spotify</span>
+        <span class="platform-count">13.4K</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg viewBox="0 0 320 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="spotGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" style="stop-color:rgba(30,215,96,0.35)"/>
+              <stop offset="100%" style="stop-color:rgba(30,215,96,0)"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,65 C20,55 40,70 60,50 C80,30 100,45 130,25 C160,5 185,35 210,20 C235,5 260,15 290,10 L290,80 L0,80 Z" fill="url(#spotGrad)"/>
+          <path d="M0,65 C20,55 40,70 60,50 C80,30 100,45 130,25 C160,5 185,35 210,20 C235,5 260,15 290,10" fill="none" stroke="#1ed760" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="290" cy="10" r="4" fill="#1ed760" stroke="#0b0e1a" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="day-labels">
+        <span class="day-label">Sun</span><span class="day-label">Mon</span><span class="day-label">Tue</span>
+        <span class="day-label">Wed</span><span class="day-label">Thu</span><span class="day-label">Fri</span><span class="day-label">Sat</span>
+      </div>
+    </div>
+
+    <!-- TikTok Chart -->
+    <div class="chart-card">
+      <div class="chart-meta">
+        <div class="chart-title">TikTok Kullanım</div>
+        <div class="chart-period">Bu hafta</div>
+      </div>
+      <div class="chart-platform-row">
+        <div class="platform-dot" style="background:#ff2d55; box-shadow:0 0 6px #ff2d55;"></div>
+        <span class="platform-name">TikTok</span>
+        <span class="platform-count">43.2K görüntülenme</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg viewBox="0 0 320 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="tiktokGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" style="stop-color:rgba(255,45,85,0.3)"/>
+              <stop offset="100%" style="stop-color:rgba(255,45,85,0)"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,70 C30,65 50,60 70,45 C90,30 105,55 130,40 C155,25 170,10 200,15 C230,20 250,30 280,8 L290,8 L290,80 L0,80 Z" fill="url(#tiktokGrad)"/>
+          <path d="M0,70 C30,65 50,60 70,45 C90,30 105,55 130,40 C155,25 170,10 200,15 C230,20 250,30 280,8 L290,8" fill="none" stroke="#ff2d55" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="290" cy="8" r="4" fill="#ff2d55" stroke="#0b0e1a" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="day-labels">
+        <span class="day-label">Sun</span><span class="day-label">Mon</span><span class="day-label">Tue</span>
+        <span class="day-label">Wed</span><span class="day-label">Thu</span><span class="day-label">Fri</span><span class="day-label">Sat</span>
+      </div>
+    </div>
+
+    <!-- Top Videos -->
+    <div class="videos-card">
+      <div class="section-header">
+        <div class="section-title">🔝 Top 10 Video</div>
+        <div class="see-all">Tümünü Gör</div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-rank top">#1</div>
+        <div class="video-thumb">🎵</div>
+        <div class="video-info">
+          <div class="video-user"><span>@djmuratti_fan</span></div>
+          <div class="video-views">1.2M görüntülenme</div>
+        </div>
+        <div class="video-bar-wrap">
+          <div class="video-bar"><div class="video-bar-fill" style="width:100%"></div></div>
+          <div class="video-views-big">1.2M</div>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-rank top">#2</div>
+        <div class="video-thumb">🎶</div>
+        <div class="video-info">
+          <div class="video-user"><span>@music_lover99</span></div>
+          <div class="video-views">876K görüntülenme</div>
+        </div>
+        <div class="video-bar-wrap">
+          <div class="video-bar"><div class="video-bar-fill" style="width:73%"></div></div>
+          <div class="video-views-big">876K</div>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-rank top">#3</div>
+        <div class="video-thumb">🎤</div>
+        <div class="video-info">
+          <div class="video-user"><span>@tiktok_beats</span></div>
+          <div class="video-views">654K görüntülenme</div>
+        </div>
+        <div class="video-bar-wrap">
+          <div class="video-bar"><div class="video-bar-fill" style="width:55%"></div></div>
+          <div class="video-views-big">654K</div>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-rank">#4</div>
+        <div class="video-thumb">🎸</div>
+        <div class="video-info">
+          <div class="video-user"><span>@vibes_only</span></div>
+          <div class="video-views">441K görüntülenme</div>
+        </div>
+        <div class="video-bar-wrap">
+          <div class="video-bar"><div class="video-bar-fill" style="width:37%"></div></div>
+          <div class="video-views-big">441K</div>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-rank">#5</div>
+        <div class="video-thumb">🎹</div>
+        <div class="video-info">
+          <div class="video-user"><span>@nightclub_official</span></div>
+          <div class="video-views">318K görüntülenme</div>
+        </div>
+        <div class="video-bar-wrap">
+          <div class="video-bar"><div class="video-bar-fill" style="width:27%"></div></div>
+          <div class="video-views-big">318K</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="bookings-card">
+      <div class="section-header">
+        <div class="section-title">Recent Bookings</div>
+        <div class="see-all">See All</div>
+      </div>
+      <div class="bookings-table-head">
+        <div class="th">Date</div>
+        <div class="th">Venue</div>
+        <div class="th" style="text-align:right">Fee</div>
+      </div>
+
+      <div class="booking-row">
+        <div>
+          <div class="booking-date">19/03/21</div>
+          <div class="booking-time">7:30 PM</div>
+        </div>
+        <div>
+          <div class="venue-name">Rightie Read</div>
+          <div class="venue-city">New York</div>
+        </div>
+        <div class="booking-fee">$50.00</div>
+      </div>
+
+      <div class="booking-row">
+        <div>
+          <div class="booking-date">28/03/23</div>
+          <div class="booking-time">10:00 PM</div>
+        </div>
+        <div>
+          <div class="venue-name">The City Books</div>
+          <div class="venue-city">New York</div>
+        </div>
+        <div class="booking-fee">$30.00</div>
+      </div>
+
+      <div class="booking-row">
+        <div>
+          <div class="booking-date">25/05/23</div>
+          <div class="booking-time">3:00 PM</div>
+        </div>
+        <div>
+          <div class="venue-name">Armour Club</div>
+          <div class="venue-city">Los Angeles</div>
+        </div>
+        <div class="booking-fee">$120.00</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">STATS</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">🎵</div>
+      <div class="nav-label">TRACKS</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">🔔</div>
+      <div class="nav-label">ALERTS</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">⚙️</div>
+      <div class="nav-label">SETTINGS</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
