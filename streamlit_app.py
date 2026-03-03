@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import time
-import os
 
 # --- 1. AYARLAR ---
 st.set_page_config(page_title="DJ MURATTI", page_icon="🎧", layout="centered")
@@ -11,39 +10,65 @@ API_KEY = "49084773d8msh07a4a9c1ac5d484p108e2ejsn2cf663d07caa"
 HOST = "tiktok-scraper7.p.rapidapi.com"
 MUSIC_ID = "7087325412228859906"
 
-# HTML dosyasını okuyan ve verileri enjekte eden fonksiyon
-def get_custom_dashboard(total_views="---", video_items_html=""):
-    try:
-        # Yüklediğin HTML dosyasını oku
-        with open("dj-muratti-analytics.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
-        
-        # 8.4M olan yeri gerçek toplam izlenme ile değiştiriyoruz
-        final_html = html_content.replace("8.4M", str(total_views))
-        
-        # Video listesi varsa, HTML'deki 'booking-list' içine enjekte et
-        if video_items_html:
-            marker = '<div class="booking-list">'
-            if marker in final_html:
-                parts = final_html.split(marker)
-                # Örnek verileri temizleyip gerçek verileri yerleştiriyoruz
-                content_after = parts[1].split("</div>", 1)[1] if "</div>" in parts[1] else ""
-                final_html = parts[0] + marker + video_items_html + "</div>" + content_after
-        
-        return final_html
-    except Exception as e:
-        return f"<div style='color:white; padding:20px;'>HTML Dosyası Yüklenemedi: {e}</div>"
+# Senin HTML Tasarımın (Buraya doğrudan gömüldü)
+def get_html_layout(total_views="8.4M", video_rows=""):
+    # HTML tasarımının başlangıcı
+    html_start = """
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root { --bg: #04060f; --surface: #0b0e1a; --cyan: #00f5ff; --green: #1ed760; --text: #e8eaf6; --muted: #5a6180; }
+      body { background: var(--bg); font-family: 'Syne', sans-serif; color: var(--text); margin: 0; padding: 0; }
+      .container { padding: 20px; max-width: 500px; margin: auto; padding-bottom: 100px; }
+      .header { text-align: center; padding: 40px 0; font-family: 'Orbitron'; letter-spacing: 10px; font-weight: 900; font-size: 32px; color: #fff; text-shadow: 0 0 20px rgba(0,245,255,0.3); }
+      .pulse-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); padding: 30px; border-radius: 32px; text-align: center; position: relative; overflow: hidden; margin-bottom: 25px; }
+      .pulse-value { font-size: 48px; font-weight: 800; color: var(--cyan); font-family: 'Syne'; margin: 10px 0; }
+      .booking-list { margin-top: 30px; }
+      .booking-row { background: var(--surface); padding: 18px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); }
+      .booking-date { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+      .booking-time { font-weight: 700; color: var(--green); }
+      .venue-name { font-weight: 700; font-size: 15px; }
+      .venue-city { font-size: 12px; color: var(--muted); }
+      .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11,14,26,0.8); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+      .nav-icon { font-size: 20px; }
+    </style>
+    </head>
+    <body>
+    <div class="container">
+      <div class="header">MURATTI</div>
+      <div class="pulse-card">
+        <div style="font-size: 12px; color: var(--muted); letter-spacing: 2px; font-weight: 700;">TOP 150 TOTAL VIEWS</div>
+        <div class="pulse-value">""" + total_views + """</div>
+        <div style="font-size: 12px; color: var(--green); font-weight: 600;">LIVE SYSTEM ACTIVE</div>
+      </div>
+      <div class="booking-list">
+    """
+    
+    html_end = """
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">🏠</div>
+      <div class="nav-item">📊</div>
+      <div class="nav-item">🎵</div>
+      <div class="nav-item">⚙️</div>
+    </div>
+    </body>
+    </html>
+    """
+    
+    return html_start + video_rows + html_end
 
-# --- 3. ANA UYGULAMA MANTIĞI ---
+# --- 3. UYGULAMA MANTIĞI ---
 
-# Ana Sayfada Analiz Butonu
-if st.button("🚀 TOP 150 ANALİZİNİ BAŞLAT"):
-    with st.spinner("TikTok Data Vault ile senkronize ediliyor..."):
+if st.button("🚀 ANALİZİ BAŞLAT"):
+    with st.spinner("TikTok Veri Kasası Açılıyor..."):
         headers = {"x-rapidapi-key": API_KEY, "x-rapidapi-host": HOST}
         try:
             all_vids = []
             cursor = "0"
-            # 150 video çekmek için döngü
             for _ in range(5):
                 res = requests.get(f"https://{HOST}/music/posts", headers=headers, params={"music_id": MUSIC_ID, "count": "30", "cursor": cursor})
                 data = res.json().get('data', {})
@@ -57,37 +82,30 @@ if st.button("🚀 TOP 150 ANALİZİNİ BAŞLAT"):
             top_150 = all_vids[:150]
             total_views_sum = sum(v.get('play_count', 0) for v in top_150)
             
-            # HTML tasarımındaki 'booking-row' yapısına uygun 50 video
-            video_rows = ""
+            video_html = ""
             sorted_vids = sorted(top_150, key=lambda x: x.get('play_count', 0), reverse=True)
             for i, v in enumerate(sorted_vids[:50], 1):
                 u_id = v.get('author', {}).get('unique_id', 'user')
                 v_url = f"https://www.tiktok.com/@{u_id}/video/{v.get('video_id')}"
-                
-                video_rows += f"""
+                video_html += f"""
                 <div class="booking-row">
                     <div>
                         <div class="booking-date">RANK #{i}</div>
-                        <div class="booking-time" style="color:#1ed760;">{v.get('play_count', 0):,} VIEWS</div>
+                        <div class="booking-time">{v.get('play_count', 0):,} VIEWS</div>
                     </div>
                     <div>
                         <div class="venue-name">@{u_id}</div>
                         <div class="venue-city"><a href="{v_url}" target="_blank" style="color:#5a6180; text-decoration:none;">TIKTOK LINK →</a></div>
                     </div>
-                    <div class="booking-fee" style="color:#00f5ff;">LIVE</div>
                 </div>
                 """
-            
-            # Sonucu göster
-            st.markdown(get_custom_dashboard(f"{total_views_sum:,}", video_rows), unsafe_allow_html=True)
+            st.markdown(get_html_layout(f"{total_views_sum:,}", video_html), unsafe_allow_html=True)
             
         except Exception as e:
             st.error(f"Sistem Hatası: {e}")
 else:
-    # Başlangıçta boş tasarım
-    st.markdown(get_custom_dashboard(), unsafe_allow_html=True)
+    # Başlangıç Ekranı
+    st.markdown(get_html_layout(), unsafe_allow_html=True)
 
-# --- 4. KAPANIŞ ---
-st.write("")
 st.divider()
-st.caption(f"DJ MURATTI | System Active | {time.strftime('%H:%M:%S')}")
+st.caption(f"© 2026 DJ MURATTI | {time.strftime('%H:%M:%S')}")
