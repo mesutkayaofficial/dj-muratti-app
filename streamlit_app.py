@@ -2,85 +2,55 @@ import streamlit as st
 import requests
 import time
 
-# --- 1. GÜVENLİK VE AYARLAR ---
-st.set_page_config(page_title="DJ MURATTI HQ", page_icon="🎧", layout="centered")
+# --- 1. GÜVENLİK ---
+st.set_page_config(page_title="DJ MURATTI HQ", page_icon="🎧")
 
-def giris_kontrol():
-    if "auth" not in st.session_state:
-        st.session_state.auth = False
-    
-    if not st.session_state.auth:
-        st.markdown("<h1 style='text-align: center; color: #1ed760; font-family: sans-serif;'>DJ MURATTI HQ</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: white;'>Lütfen erişim anahtarınızı giriniz.</p>", unsafe_allow_html=True)
-        
-        sifre = st.text_input("", type="password", placeholder="Şifre...")
-        if st.button("SİSTEME GİRİŞ YAP"):
-            if sifre == "MURATTI2026":
-                st.session_state.auth = True
-                st.rerun()
-            else:
-                st.error("Hatalı Şifre!")
-        st.stop()
+if "auth" not in st.session_state:
+    st.session_state.auth = False
 
-giris_kontrol()
+if not st.session_state.auth:
+    st.title("🎧 DJ MURATTI HQ")
+    sifre = st.text_input("Erişim Şifresi", type="password")
+    if st.button("Giriş Yap"):
+        if sifre == "MURATTI2026":
+            st.session_state.auth = True
+            st.rerun()
+        else:
+            st.error("Hatalı!")
+    st.stop()
 
-# --- 2. MODERN UI TASARIMI ---
+# --- 2. TASARIM ---
 st.markdown("""
     <style>
     .stApp { background-color: #000000; }
-    div[data-testid="stMetric"] {
-        background-color: #0a0a0a;
-        border: 1px solid #1ed760;
-        padding: 25px;
-        border-radius: 20px;
-        text-align: center;
-    }
-    label[data-testid="stMetricLabel"] { color: #aaaaaa !important; font-size: 16px !important; text-transform: uppercase; }
-    div[data-testid="stMetricValue"] { color: #1ed760 !important; font-size: 36px !important; font-weight: bold !important; }
-    .stButton>button {
-        width: 100%;
-        border-radius: 50px;
-        height: 3.5em;
-        background-color: #1ed760;
-        color: black;
-        font-weight: bold;
-        border: none;
-        letter-spacing: 1px;
-        margin-top: 10px;
-    }
-    hr { border-color: #222222; }
+    div[data-testid="stMetric"] { background-color: #0a0a0a; border: 1px solid #1ed760; padding: 20px; border-radius: 15px; }
+    div[data-testid="stMetricValue"] { color: #1ed760 !important; }
+    .stButton>button { width: 100%; border-radius: 50px; background-color: #1ed760; color: black; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. ÜST PANEL ---
-st.markdown("<h1 style='text-align: center; color: white; margin-bottom:0;'>DJ MURATTI</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #1ed760; font-weight: bold;'>LIVE PERFORMANCE TRACKER</p>", unsafe_allow_html=True)
-st.write("")
+st.title("DJ MURATTI")
+st.write("TikTok Performans Takibi")
 
-# --- 4. VERİ ÇEKME MOTORU ---
-try:
-    API_KEY = st.secrets["api_key"]
-except:
-    API_KEY = "49084773d8msh07a4a9c1ac5d484p108e2ejsn2cf663d07caa"
-
+# --- 3. VERİ ---
+API_KEY = "49084773d8msh07a4a9c1ac5d484p108e2ejsn2cf663d07caa"
 HOST = "tiktok-scraper7.p.rapidapi.com"
-MUSIC_LINK = "https://www.tiktok.com/music/Triangel-Violin-Classic-7087325412228859906"
+URL = "https://www.tiktok.com/music/Triangel-Violin-Classic-7087325412228859906"
 
-if st.button("🔄 VERİLERİ ŞİMDİ GÜNCELLE"):
-    with st.spinner(""):
+if st.button("VERİLERİ GÜNCELLE"):
+    with st.spinner("Lütfen bekleyin..."):
         headers = {"x-rapidapi-key": API_KEY, "x-rapidapi-host": HOST}
         try:
-            res_info = requests.get(f"https://{HOST}/music/info", headers=headers, params={"url": MUSIC_LINK})
-            info = res_info.json().get('data', {})
-            
-            res_p = requests.get(f"https://{HOST}/music/posts", headers=headers, params={"music_id": "7087325412228859906", "count": "30", "cursor": "0"})
-            vids = res_p.json().get('data', {}).get('videos', [])
-            izlenme = sum(v.get('play_count', 0) for v in vids)
+            res = requests.get(f"https://{HOST}/music/info", headers=headers, params={"url": URL})
+            info = res.json().get('data', {})
             
             st.write("")
             c1, c2 = st.columns(2)
-            c1.metric("TOPLAM VİDEO", f"{info.get('video_count', 0):,}")
-            c2.metric("TREND İZLENME", f"{izlenme:,}")
-            
-            st.write("")
-            st.toast("Veriler güncellendi!", icon="
+            c1.metric("VİDEO SAYISI", f"{info.get('video_count', 0):,}")
+            c2.metric("DURUM", "AKTİF")
+            st.success("Veriler başarıyla çekildi.")
+        except:
+            st.error("Bağlantı hatası!")
+
+st.divider()
+st.caption(f"Sistem Zamanı: {time.strftime('%H:%M:%S')}")
